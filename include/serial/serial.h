@@ -321,6 +321,9 @@ public:
   size_t
   readline (std::string &buffer, size_t size = 65536, std::string eol = "\n");
 
+  size_t
+  readline (uint8_t* buffer, size_t size, uint8_t eol);
+
   /*! Reads in a line or until a given delimiter has been processed.
    *
    * Reads from the serial port until a single line has been read.

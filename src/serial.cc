@@ -168,6 +168,7 @@ Serial::readline (string &buffer, size_t size, string eol)
   while (true)
   {
     size_t bytes_read = this->read_ (buffer_ + read_so_far, 1);
+    printf("%d %02X\n", bytes_read, *(buffer.c_str() + read_so_far - 1));
     read_so_far += bytes_read;
     if (bytes_read == 0) {
       break; // Timeout occured on reading 1 byte
@@ -181,6 +182,32 @@ Serial::readline (string &buffer, size_t size, string eol)
     }
   }
   buffer.append(reinterpret_cast<const char*> (buffer_), read_so_far);
+  return read_so_far;
+}
+
+
+size_t
+Serial::readline (uint8_t* buffer, size_t size, uint8_t eol)
+{
+  ScopedReadLock lock(this->pimpl_);
+
+  size_t read_so_far = 0;
+  while (true)
+  {
+    size_t bytes_read = this->read_ (buffer + read_so_far, 1);
+    //printf("%d %02X\n", bytes_read, *(buffer + read_so_far - 1));
+    read_so_far += bytes_read;
+    if (bytes_read == 0) {
+      break; // Timeout occured on reading 1 byte
+    }
+    if (*(buffer + read_so_far - 1) == (char)eol) {
+      break; // EOL found
+    }
+    if (read_so_far == size) {
+      break; // Reached the maximum read length
+    }
+  }
+
   return read_so_far;
 }
 
